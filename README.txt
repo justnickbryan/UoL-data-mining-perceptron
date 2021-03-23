@@ -27,11 +27,8 @@ pip install numpy
 
 ### 3. Usage
 
-```python
-import CA1_Perceptron.py
-
-Perceptron...
-```
+In order to successfully run the analysis, ensure that the data files "train.data" and "test.data" are stored in a subdirectory "Data".
+For example, this directory structure is demonstrated in the following GitHub repository: https://github.com/justnickbryan/UoL-data-mining-perceptron
 
 
 ### 4. Author
@@ -39,11 +36,3 @@ Perceptron...
 Nick Bryan,
 Student ID:201531951,
 MSc Data Science & AI
-
-***
-#### Note to self
-
-Preview Markdown with
-```
-CTRL + Shift + V
-```
