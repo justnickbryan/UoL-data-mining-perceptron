@@ -3,6 +3,10 @@
 
 import numpy as np
 
+trainingData = open("train.data", "r")
+
+trainingData.read()
+
 class Perceptron:
     """Perceptron class for training and testing a binary classifier.
     
@@ -29,13 +33,15 @@ class Perceptron:
             str: string representation of Perceptron instance.
         """
 
-        return "Perceptron: Epochs = {self.epochs}".format(self=self))
+        return "Perceptron: Epochs = {self.epochs}".format(self=self)
 
 
     def trainPerceptron(self):
         """Trains the Perceptron for binary classification using a labelled dataset.
 
         Args:
-            trainingData (array): n x m dimensional array of n records (rows) and m features (columns).
+            trainingFeatures (array): n x m dimensional array of n records (rows) and m features (columns) from the training data.
             trainingTrueClass (array): n x 1 dimensional array (vector) of n labels corresponding to each record in the training data.
         """
+
+        trainingFeatures = "Features"
