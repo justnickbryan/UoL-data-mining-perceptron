@@ -38,8 +38,8 @@ class Perceptron:
             str: string representation of Perceptron instance.
         """
 
-        return "Perceptron (Training): Epochs = {self.epochs}, Seed = {self.seed}, Weights = {self._weights}, Bias = {self._bias},\
-            \nErrors = {self._errors}, Accuracy = {self._accuracy}\n".format(self=self)
+        return "Perceptron (Training): Epochs = {self.epochs}, Random Seed = {self.seed}, Weights = {self._weights}, Bias = {self._bias},\
+            \nErrors = {self._errors}, Accuracy = {self._accuracy:.1f}%\n".format(self=self)
 
 
     def train(self, records, labels):
@@ -52,7 +52,7 @@ class Perceptron:
                 corresponding to each record in the training data.
         """
 
-        print("\nTRAINING MODE\n")
+        print("\nTRAINING MODE\nInitial")
 
         # Initialise weights as vector of zeros.
         self._weights = np.zeros((records.shape[1]))
@@ -106,6 +106,7 @@ class Perceptron:
             # print("Weights =", self._weights, ", Bias =", self._bias)
             # print("Errors =", epochErrors, ", Accuracy =", self._accuracy)
 
+        print("Final")
         print(self)
         return self
 
@@ -174,7 +175,7 @@ class Perceptron:
         # Accuracy = TP + TN / n, where n is the total number of classifications (TP + TN + FP + FN)
         # FP + FN = errors
         tpAndTn = n - errors
-        accuracy = float(tpAndTn / n)
+        accuracy = (tpAndTn / n) * 100
         return accuracy
 
     def test(self, records, labels):
@@ -187,7 +188,7 @@ class Perceptron:
                 corresponding to each record in the training data.
         """
         
-        print("\nTEST MODE\n")
+        print("TEST MODE")
 
         errors = 0
 
@@ -202,7 +203,7 @@ class Perceptron:
             # print("Record = {}, Predicted Label = {}, True Label = {}".format(record, predictedLabel, label))
             
         accuracy = self.evaluation(errors, labels.shape[0])
-        print("Perceptron (Testing): Errors = {}, Accuracy = {}".format(errors, accuracy))
+        print("Perceptron (Testing): Errors = {}, Accuracy = {:.1f}%".format(errors, accuracy))
 
 
 # Use main() method for implementation of Perceptron for classification tasks.
