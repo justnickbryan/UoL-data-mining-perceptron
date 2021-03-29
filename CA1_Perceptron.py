@@ -14,9 +14,11 @@ class Perceptron:
         _weights (:obj: 'array' of :obj: 'float'): m x 1 dimensional array (vector) of m weights (initialised as 0)
             corresponding to the m features of each record.
         _bias (float): input bias.
-        _errors (:obj: 'list' of :obj: 'int'): a list of integers corresponding to the number of misclassifcations
+        _trainErrors (:obj: 'list' of :obj: 'int'): a list of integers corresponding to the number of misclassifications
             (errors) during each epoch of the training.
-        _accuracy (float): percentage accuracy of classification measured during the training of the Perceptron.
+        _trainAccuracy (float): percentage accuracy of classification measured during the training of the Perceptron.
+        _testErrors (int): the number of misclassifications during testing.
+        _testAccuracy (float): percentage accuracy of classification measured during the testing of the Perceptron.
     """
 
     def __init__(self, theEpochs = 20, theSeed = 3):
@@ -39,7 +41,7 @@ class Perceptron:
         """
 
         return "Perceptron (Training): Epochs = {self.epochs}, Random Seed = {self.seed}, Weights = {self._weights}, Bias = {self._bias},\
-            \nErrors = {self._errors}, Accuracy = {self._accuracy:.1f}%\n".format(self=self)
+            \nTraining Errors = {self._trainErrors}, Training Accuracy = {self._trainAccuracy:.1f}%\n".format(self=self)
 
 
     def train(self, records, labels):
@@ -64,10 +66,10 @@ class Perceptron:
         rng = np.random.default_rng(seed = self.seed)
 
         # Initialise the errors as an empty list.
-        self._errors = []
+        self._trainErrors = []
 
         # Initialise accuracy as zero.
-        self._accuracy = 0.0
+        self._trainAccuracy = 0.0
 
         # Print initialised state of Perceptron before training.
         print(self)
@@ -98,9 +100,9 @@ class Perceptron:
                     self._bias = self._bias + label
 
             # Update the list of errors by appending the integer value of the total number of errors in current epoch.
-            self._errors.append(epochErrors)
+            self._trainErrors.append(epochErrors)
             # Calculate and update the accuracy of the classifier for the current epoch.
-            self._accuracy = self.evaluation(epochErrors, labels.shape[0])
+            self._trainAccuracy = self.evaluation(epochErrors, labels.shape[0])
 
         print("Final")
         # Print final state of Perceptron following training.
@@ -208,7 +210,7 @@ class Perceptron:
         print("TEST MODE")
 
         # Initialise the number of errors in test mode as zero.
-        errors = 0
+        self._testErrors = 0
 
         # Iterate over each record and corresponding true class label in the test dataset.
         for record, label in zip(records, labels):
@@ -220,11 +222,11 @@ class Perceptron:
             # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
             #   label equals negative one.
             if (predictedLabel * label) <= 0:
-                errors += 1
+                self._testErrors += 1
 
         # Calculate and update the accuracy of the classifier.                
-        accuracy = self.evaluation(errors, labels.shape[0])
-        print("Perceptron (Testing): Errors = {}, Accuracy = {:.1f}%".format(errors, accuracy))
+        self._testAccuracy = self.evaluation(self._testErrors, labels.shape[0])
+        print("Perceptron (Testing): Test Errors = {self._testErrors}, Test Accuracy = {self._testAccuracy:.1f}%".format(self=self))
 
 
 
