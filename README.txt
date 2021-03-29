@@ -2,6 +2,17 @@
 
 Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
+## To Do List
+
+* Amend printed output of the __str__ method to only show key attributes of the Perceptron: epochs, random seed, weights,
+    bias, multi-class classification T/F and L2 regularisation coefficient.
+
+* Move printout of training errors and accuracy to a separate print function under the training method.
+
+* Add 1 vs Rest input datasets and Perceptron instances to main() method.
+
+* Add L2 regularisation Perceptron instances to the main() method.
+
 
 ## Table of Contents
 1. General Information
@@ -29,8 +40,8 @@ pip install numpy
 
 In order to successfully run the analysis, ensure that the data files "train.data" and "test.data" are stored in a
 subdirectory "Data" of the directory containing the script file CA1_Perceptron.py.
-For example, this directory structure is demonstrated in the following GitHub repository:
-https://github.com/justnickbryan/UoL-data-mining-perceptron
+    For example, this directory structure is demonstrated in the following GitHub repository:
+    https://github.com/justnickbryan/UoL-data-mining-perceptron
 
 
 ### 4. Author
