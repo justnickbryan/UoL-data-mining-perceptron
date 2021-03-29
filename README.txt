@@ -27,8 +27,10 @@ pip install numpy
 
 ### 3. Usage
 
-In order to successfully run the analysis, ensure that the data files "train.data" and "test.data" are stored in a subdirectory "Data".
-For example, this directory structure is demonstrated in the following GitHub repository: https://github.com/justnickbryan/UoL-data-mining-perceptron
+In order to successfully run the analysis, ensure that the data files "train.data" and "test.data" are stored in a
+subdirectory "Data" of the directory containing the script file CA1_Perceptron.py.
+For example, this directory structure is demonstrated in the following GitHub repository:
+https://github.com/justnickbryan/UoL-data-mining-perceptron
 
 
 ### 4. Author
