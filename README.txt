@@ -11,6 +11,31 @@ Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
 * Add 1 vs Rest input datasets and Perceptron instances to main() method.
 
+* Remove index column from self._trainConfidence array, so that it is ordered values only.
+
+* Update attribute docs for self._trainConfidence
+
+* Update returns docs for combinedShuffle method regarding permutation
+
+* Convert labels dataset to integer values:
+    for label in labels:
+        if label == 'class-1':
+            label = 1
+        elif label == 'class-2':
+            label = 2
+        elif label == 'class-3':
+            label = 3
+
+* Complete train method for Multiclass_Perceptron class by comparing labels of dataset with argmax labels:
+    errors = 0
+    for predictedLabel, trueLabel in zip(predictedLabels, labels):
+        if predictedLabel != trueLabel:
+            errors += 1
+    
+* Add evaluation method for Multiclass_Perceptron class
+
+* Add test method for Multiclass_Perceptron class
+
 * Add L2 regularisation Perceptron instances to the main() method.
 
 
