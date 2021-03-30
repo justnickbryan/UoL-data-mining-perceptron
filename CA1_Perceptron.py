@@ -21,10 +21,10 @@ class Perceptron:
         _trainAccuracy (float): percentage accuracy of classification measured during the training of the Perceptron.
         _testErrors (int): the number of misclassifications during testing.
         _testAccuracy (float): percentage accuracy of classification measured during the testing of the Perceptron.
-        _trainConfidence (:obj: 'list' of :obj: 'float'): list of confidence scores following the training of the model
-            for the One-vs-Rest classification of each training record.
-        _testConfidence (:obj: 'list' of :obj: 'float'): list of confidence scores for the One-vs-Rest classification
-            of each test record.
+        _trainConfidence (:obj: 'array' of :obj: 'float'): n x 1 dimensional array of confidence scores generated from
+            the training of a model for the One-vs-Rest classification of each training record.
+        _testConfidence (:obj: 'array' of :obj: 'float'): n x 1 dimensional array of confidence scores for the
+            One-vs-Rest classification of each test record.
     """
 
     def __init__(self, theEpochs = 20, theSeed = 3, theMulticlass = False, theL2Coefficient = 0.0):
@@ -167,10 +167,11 @@ class Perceptron:
                 (rows) and m features (columns) from the training data.
             shuffledLabels (:obj: 'array' of :obj: 'int'): randomly permuted n dimensional vector of true class labels
                 (as binary values +1 or -1) corresponding to each record in the training data.
-            permutation (:obj: 'array' of :obj: 'int'): 
+            permutation (:obj: 'array' of :obj: 'int'): permutation matrix used to shuffle the rows of the dataset by
+                by index.
         """
         
-        # Generate a permutation index array corresponding to the size of the dataset.
+        # Randomly generate an index permutation matrix with n values (corresponding to the n data records).
         permutation = rng.permutation(records.shape[0])
 
         # Shuffle the two arrays by index using the same random permutation (in the square brackets).

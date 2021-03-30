@@ -13,10 +13,6 @@ Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
 * Remove index column from self._trainConfidence array, so that it is ordered values only.
 
-* Update attribute docs for self._trainConfidence
-
-* Update returns docs for combinedShuffle method regarding permutation
-
 * Convert labels dataset to integer values:
     for label in labels:
         if label == 'class-1':
