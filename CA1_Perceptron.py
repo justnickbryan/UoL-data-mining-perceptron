@@ -298,10 +298,34 @@ class Multiclass_Perceptron:
                 model = perceptron._trainConfidence
                 modelArray = np.concatenate((modelArray, model), axis=1)
 
-        print(modelArray)
+        predictionArray = np.argmax(modelArray, axis=1)
+
+        # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
+        #   label equals negative one.
+        errors = 0
+        for predictedLabel, trueLabel in zip(predictionArray, labels):
+            if predictedLabel != trueLabel:
+                errors += 1
+
+        n = labels.shape[0]
+        # TP + TN = total number of classifications (n) - number of misclassifications (errors).
+        tpAndTn = n - errors
+
+        # Percentage Accuracy = (number of correct classifications / total number of classifications) * 100
+        accuracy = (tpAndTn / n) * 100
+        print("Errors = ", errors, ", Accuracy = ", accuracy)
+
+
+    def test(self, labels):
+        
+        model = self.Perceptrons[0]._trainConfidence
+        modelArray = model
+
+        for index, perceptron in zip(range(1, len(self.Perceptrons)), self.Perceptrons[1:]):
+                model = perceptron._trainConfidence
+                modelArray = np.concatenate((modelArray, model), axis=1)
 
         predictionArray = np.argmax(modelArray, axis=1)
-        print(predictionArray)
 
         # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
         #   label equals negative one.
@@ -355,13 +379,10 @@ def main():
 
     # # Initialise an instance of the Perceptron for discriminating between class 1 and 2.
     # classifier1Vs2 = Perceptron()
-
     # # Train the Perceptron.
     # classifier1Vs2.train(class1And2Records, class1And2Labels)
-
     # # Test the Perceptron.
     # classifier1Vs2.test(class1And2TestRecords, class1And2TestLabels)
-
 
 
     # ### Class 2 vs Class 3 ###
@@ -377,13 +398,10 @@ def main():
 
     # # Initialise an instance of the Perceptron for discriminating between class 2 and 3.
     # classifier2Vs3 = Perceptron()
-
     # # Train the Perceptron.
     # classifier2Vs3.train(class2And3Records, class2And3Labels)
-
     # # Test the Perceptron.
     # classifier2Vs3.test(class2And3TestRecords, class2And3TestLabels)
-
 
 
     # ### Class 1 vs Class 3 ###
@@ -412,10 +430,8 @@ def main():
 
     # # Initialise an instance of the Perceptron for discriminating between class 1 and 3.
     # classifier1Vs3 = Perceptron()
-    
     # # Train the Perceptron.
     # classifier1Vs3.train(class1And3Records, class1And3Labels)
-
     # # Test the Perceptron.
     # classifier1Vs3.test(class1And3TestRecords, class1And3TestLabels)
 
@@ -425,11 +441,10 @@ def main():
 
     ## Task 4 ##
     ## Extend the binary perceptron to perform multi-class classification using the One-vs-Rest approach. ##
-
     print("\n\n# Multi-Class Classification: One vs Rest #")
 
     ### Class 1 vs Rest ###
-    print("\n# Class 1 vs Rest Training #")
+    print("\n# Class 1 vs Rest #")
 
     # Assign binary labels, where class 1 records are positive and the rest are negative.
     trainingLabelsClass1 = np.where(trainingLabels == "class-1", 1, -1) # Training Data Labels
@@ -439,10 +454,12 @@ def main():
     classifier1VsRest = Perceptron(theMulticlass=True)
     # Train the Perceptron binary model on the entire training dataset.
     classifier1VsRest.train(trainingRecords, trainingLabelsClass1)
+    # Test the Perceptron binary model on the entire test dataset.
+    classifier1VsRest.test(testRecords, testLabelsClass1)
 
 
     ### Class 2 vs Rest ###
-    print("\n# Class 2 vs Rest Training #")
+    print("\n# Class 2 vs Rest #")
 
     # Assign binary labels, where class 2 records are positive and the rest are negative.
     trainingLabelsClass2 = np.where(trainingLabels == "class-2", 1, -1) # Training Data Labels
@@ -452,10 +469,12 @@ def main():
     classifier2VsRest = Perceptron(theMulticlass=True)
     # Train the Perceptron binary model on the entire training dataset.
     classifier2VsRest.train(trainingRecords, trainingLabelsClass2)
+    # Test the Perceptron binary model on the entire test dataset.
+    classifier2VsRest.test(testRecords, testLabelsClass2)
 
 
     ### Class 3 vs Rest ###
-    print("\n# Class 3 vs Rest Training #")
+    print("\n# Class 3 vs Rest #")
 
     # Assign binary labels, where class 3 records are positive and the rest are negative.
     trainingLabelsClass3 = np.where(trainingLabels == "class-3", 1, -1) # Training Data Labels
@@ -465,27 +484,38 @@ def main():
     classifier3VsRest = Perceptron(theMulticlass=True)
     # Train the Perceptron binary model on the entire training dataset.
     classifier3VsRest.train(trainingRecords, trainingLabelsClass3)
+    # Test the Perceptron binary model on the entire test dataset.
+    classifier3VsRest.test(testRecords, testLabelsClass3)
 
 
     ### Multi-Class Classification ###
+    print("\n# Multi-Class Classification #")
     
-    # Initialise an instance of the multi-class Perceptron for evaluation of the One-vs-Rest approach.
-    multiClassifier = Multiclass_Perceptron((classifier1VsRest, classifier2VsRest, classifier3VsRest))
+    # Labels reassigned as the integers 0, 1, and 2 for ease of comparison with the argmax values that are used to find
+    #   the predicted label during multi-class classification.
     
-    # Training labels reassigned as the integers 0, 1, and 2 for ease of comparison with the argmax values that are used
-    #   to find the predicted label during multi-class classification.
-    # First, change the training labels to the numeric strings '0', '1', and '2'. 
+    # Training Labels.
+    # First, change the labels to the numeric strings '0', '1', and '2'. 
     trainingLabels[trainingLabels == 'class-1'] = '0'
     trainingLabels[trainingLabels == 'class-2'] = '1'
     trainingLabels[trainingLabels == 'class-3'] = '2'
     # Then, cast all labels as integers.
-    multiclassLabels = trainingLabels.astype(int)
+    multiclassTrainLabels = trainingLabels.astype(int)
 
-    print("Multi-Class labels:\n", multiclassLabels)
+    # Test Labels.
+    # First, change the labels to the numeric strings '0', '1', and '2'. 
+    testLabels[testLabels == 'class-1'] = '0'
+    testLabels[testLabels == 'class-2'] = '1'
+    testLabels[testLabels == 'class-3'] = '2'
+    # Then, cast all labels as integers.
+    multiclassTestLabels = testLabels.astype(int)
 
-
-    print("\n# Multi-Class Classification #")
-    multiClassifier.train(multiclassLabels)
+    # Initialise an instance of the multi-class Perceptron for evaluation of the One-vs-Rest approach.
+    multiClassifier = Multiclass_Perceptron((classifier1VsRest, classifier2VsRest, classifier3VsRest))
+    # Perform multi-class classification on the training data.
+    multiClassifier.train(multiclassTrainLabels)
+    # Perform multi-class classification on the test data.
+    multiClassifier.test(multiclassTestLabels)
 
 
 # Only performs classification tasks above if script has not been imported.

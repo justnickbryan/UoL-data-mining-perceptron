@@ -9,9 +9,9 @@ Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
 * Move printout of training errors and accuracy to a separate print function under the training method.
    
-* Add evaluation method for Multiclass_Perceptron class
+* Improve evaluation method for Multiclass_Perceptron class
 
-* Add test method for Multiclass_Perceptron class
+* Update test method for Multiclass_Perceptron class
 
 * Add L2 regularisation Perceptron instances to the main() method.
 
