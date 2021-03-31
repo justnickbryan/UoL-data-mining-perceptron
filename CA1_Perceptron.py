@@ -1,9 +1,12 @@
 # COMP527 CA1 - Perceptron
 # Nick Bryan (ID: 201531951)
 
+#----------------------------------------------------------------------------------------------------------------------#
 
 import numpy as np
 
+
+# BINARY PERCEPTRON AND MULTI-CLASS CLASSIFICATION CLASSES #
 
 class Perceptron:
     """Perceptron class for training and testing a binary classifier.
@@ -11,7 +14,7 @@ class Perceptron:
     Attributes:
         epochs (int): total number of iterations over the entire set of training data.
         seed (int): seed for reproducible random number generation for data shuffling.
-        multiclass (boolean): allows multi-class classification if true, else binary classification only.
+####        multiclass (boolean): allows multi-class classification if true, else binary classification only.
         l2Coefficient (float): L2 regularisation coefficient.
         _weights (:obj: 'array' of :obj: 'float'): m x 1 dimensional array (vector) of m weights (initialised as 0)
             corresponding to the m features of each record.
@@ -27,20 +30,20 @@ class Perceptron:
             One-vs-Rest classification of each test record.
     """
 
-    def __init__(self, theEpochs = 20, theSeed = 3, theMulticlass = False, theL2Coefficient = 0.0):
+    def __init__(self, theEpochs = 20, theSeed = 3, theL2Coefficient = 0.0):
         """Initialiser creates an instance of the Perceptron.
 
         Args:
             theEpochs (int, optional): total number of iterations over the entire set of training data. Defaults to 20.
             theSeed (int, optional): seed for reproducible random number generation for data shuffling. Defaults to 20.
-            multiclass (boolean, optional): allows multi-class classification if true, else binary classification only.
-                Defaults to False.
+####            multiclass (boolean, optional): allows multi-class classification if true, else binary classification only.
+####                Defaults to False.
             l2Coefficient (float, optional): L2 regularisation coefficient. Defaults to 0.0.
         """
 
         self.epochs = theEpochs
         self.seed = theSeed
-        self.multiclass = theMulticlass
+####        self.multiclass = theMulticlass
         self.l2Coefficient = theL2Coefficient
 
 
@@ -51,8 +54,7 @@ class Perceptron:
             str: string representation of Perceptron instance, displaying the attributes of the Perceptron's training.
         """
 
-        return "Perceptron (Training): Epochs = {self.epochs}, Random Seed = {self.seed}, Weights = {self._weights}, Bias = {self._bias},\
-            \nTraining Errors = {self._trainErrors}, Training Accuracy = {self._trainAccuracy:.1f}%\n".format(self=self)
+        return "Perceptron: Epochs = {self.epochs}, Random Seed = {self.seed}, Weights = {self._weights}, Bias = {self._bias}".format(self=self)
 
 
     def train(self, records, labels):
@@ -65,7 +67,7 @@ class Perceptron:
                 corresponding to each record in the training data.
         """
 
-        print("\nTRAINING MODE\nInitial")
+        print("\nTRAINING MODE")
 
         # Initialise weights as vector of zeros.
         self._weights = np.zeros((records.shape[1]))
@@ -81,7 +83,7 @@ class Perceptron:
         self._trainAccuracy = 0.0
 
         # Print initialised state of Perceptron before training.
-        print(self)
+        print("Initial State,", self)
 
         # Iterate over entire training dataset the number of times given by the epochs value.
         for epoch in range(1, self.epochs + 1):
@@ -120,7 +122,8 @@ class Perceptron:
             # Calculate and update the accuracy of the classifier for the current epoch.
             self._trainAccuracy = self.evaluation(epochErrors, labels.shape[0])
 
-            # One-vs-Rest
+            # One-vs-Rest: the list of confidence scores is ordered as per the permuted training dataset.
+            #   Convert list into an array and sort into the order of the original dataset for multi-class evaluation.
             if epoch == self.epochs: 
                 # Iterate over both the index-permutation array from the final training epoch and the list of confidence
                 #   scores, to create a new list of indexed scores in tuples as (dataset index, confidence score).
@@ -137,8 +140,8 @@ class Perceptron:
                 self._trainConfidence = np.delete(confidenceArraySorted, 0, 1)
 
         # Print final state of Perceptron following training.
-        print("Final")
-        print(self) 
+        print("Final State,", self)
+        print("Errors = {self._trainErrors}, Accuracy = {self._trainAccuracy:.1f}%".format(self=self))
 
 
     def combinedShuffle(self, rng, records, labels):
@@ -247,8 +250,8 @@ class Perceptron:
         # Initialise the number of errors in test mode as zero.
         self._testErrors = 0
 
-        # Initialise empty list for the compilation of confidence scores for each record of the test dataset.
-        self._testConfidence = []
+        # One-vs-Rest: Initialise empty list for the compilation of confidence scores for each record of test dataset.
+        confidenceScores = []
 
         # Iterate over each record and corresponding true class label in the test dataset.
         for record, label in zip(records, labels):
@@ -257,26 +260,30 @@ class Perceptron:
             activationScore = self.adder(record)
             predictedLabel = self.output(activationScore)
 
-            # For a binary Perceptron, the confidence score is equal to the activation score.
-            # Append the activation score to the list of confidence scores for the test dataset.
-            self._testConfidence.append(activationScore)
+            # One-vs-Rest: For a binary Perceptron, the confidence score is equal to the activation score.
+            #   Append the activation score to the list of confidence scores for the test dataset.
+            confidenceScores.append(activationScore)
 
             # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
             #   label equals negative one.
             if (predictedLabel * label) <= 0:
                 self._testErrors += 1
 
+        # Convert the list of confidence scores into an array for multiclass comparison.
+        self._testConfidence = np.asarray(confidenceScores).reshape(labels.shape[0],1)
+
         # Calculate and update the accuracy of the classifier.                
         self._testAccuracy = self.evaluation(self._testErrors, labels.shape[0])
-        print("Perceptron (Testing): Test Errors = {self._testErrors}, Test Accuracy = {self._testAccuracy:.1f}%".format(self=self))
+        print("Errors = {self._testErrors}, Accuracy = {self._testAccuracy:.1f}%".format(self=self))
+
 
 
 class Multiclass_Perceptron:
-    """Multi-class classification with the binary Perceptron the using the One-vs-Rest approach.
+    """Multi-class classifier that uses binary Perceptrons in a One-vs-Rest approach.
 
     Attributes:
-        Perceptrons (:obj: 'tuple' of :class: 'Perceptron'): instances of the binary Perceptron used as the predictive
-            models for multi-class classification with a One-vs-Rest approach.
+        Perceptrons (:obj: 'tuple' of :class: 'Perceptron'): instances of the binary Perceptron class used as the
+            predictive models for multi-class classification with a One-vs-Rest approach.
         _trainErrors (:obj: 'list' of :obj: 'int'): a list of integers corresponding to the number of misclassifications
             (errors) during each epoch of the training.
         _trainAccuracy (float): percentage accuracy of classification measured during the training of the Perceptron.
@@ -285,65 +292,103 @@ class Multiclass_Perceptron:
     """
 
     def __init__(self, thePerceptrons):
+        """Initialiser creates an instance of the multi-class classifier.
+
+        Args:
+            thePerceptrons (:obj: 'tuple' of :class: 'Perceptron'): instances of the binary Perceptron class used as the
+                predictive models for multi-class classification with a One-vs-Rest approach.
+        """
 
         self.Perceptrons = thePerceptrons
+        self._trainErrors = 0
+        self._trainAccuracy = 0.0
+        self._testErrors = 0
+        self._testAccuracy = 0.0
 
 
     def train(self, labels):
-        
-        model = self.Perceptrons[0]._trainConfidence
-        modelArray = model
+        """Predicts class labels of training data by finding argmax of the One-vs-Rest binary Perceptron models.
 
+        Args:
+            labels (:obj: 'array' of :obj: 'int'): n dimensional vector of c true class labels (where class labels are
+                integers from 0 to c-1). Each label corresponds to a record in the training data.
+        """
+
+        print("\nMULTI-CLASS TRAINING MODE")
+        
+        # Get the confidence array for the first Perceptron model.
+        modelArray = self.Perceptrons[0]._trainConfidence
+
+        # Iterate over the number of and class objects of the Perceptron models, excluding the first Perceptron.
         for index, perceptron in zip(range(1, len(self.Perceptrons)), self.Perceptrons[1:]):
+                # Get the confidence array for the current Perceptron.
                 model = perceptron._trainConfidence
+                # Add the confidence array as a column to the right of the previous model.
                 modelArray = np.concatenate((modelArray, model), axis=1)
 
+        # Find the argmax of each row of the array of confidence scores (index of column with maximum value in the row).
         predictionArray = np.argmax(modelArray, axis=1)
 
-        # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
-        #   label equals negative one.
-        errors = 0
+        # Performance Evaluation
+
         for predictedLabel, trueLabel in zip(predictionArray, labels):
+            # Add one to errors if misclassification occurs, i.e. when predicted label and true label are not equal.
             if predictedLabel != trueLabel:
-                errors += 1
+                self._trainErrors += 1
 
         n = labels.shape[0]
         # TP + TN = total number of classifications (n) - number of misclassifications (errors).
-        tpAndTn = n - errors
-
+        tpAndTn = n - self._trainErrors
         # Percentage Accuracy = (number of correct classifications / total number of classifications) * 100
-        accuracy = (tpAndTn / n) * 100
-        print("Errors = ", errors, ", Accuracy = ", accuracy)
+        self._trainAccuracy = (tpAndTn / n) * 100
+        print("Errors = {self._trainErrors}, Accuracy = {self._trainAccuracy:.1f}%".format(self=self))
 
 
     def test(self, labels):
-        
-        model = self.Perceptrons[0]._trainConfidence
-        modelArray = model
+        """Predicts class labels of test data by finding argmax of the One-vs-Rest binary Perceptron models.
 
+        Note: each Perceptron should be trained prior to the classification of test data.
+
+        Args:
+            labels (:obj: 'array' of :obj: 'int'): n dimensional vector of c true class labels (where class labels are
+                integers from 0 to c-1). Each label corresponds to a record in the test data.
+        """
+
+        print("\nMULTI-CLASS TEST MODE")
+
+        # Get the confidence array for the first Perceptron model.
+        modelArray = self.Perceptrons[0]._testConfidence
+
+        # Iterate over the number of and class objects of the Perceptron models, excluding the first Perceptron.
         for index, perceptron in zip(range(1, len(self.Perceptrons)), self.Perceptrons[1:]):
-                model = perceptron._trainConfidence
+                # Get the confidence array for the current Perceptron.
+                model = perceptron._testConfidence
+                # Add the confidence array as a column to the right of the previous model.
                 modelArray = np.concatenate((modelArray, model), axis=1)
 
+        # Find the argmax of each row of the array of confidence scores (index of column with maximum value in the row).
         predictionArray = np.argmax(modelArray, axis=1)
 
-        # Add one to number of errors if misclassification occurs, i.e. when the product of predicted label and true
-        #   label equals negative one.
-        errors = 0
+        # Performance Evaluation
+
         for predictedLabel, trueLabel in zip(predictionArray, labels):
+            # Add one to errors if misclassification occurs, i.e. when predicted label and true label are not equal.
             if predictedLabel != trueLabel:
-                errors += 1
+                self._testErrors += 1
 
         n = labels.shape[0]
         # TP + TN = total number of classifications (n) - number of misclassifications (errors).
-        tpAndTn = n - errors
-
+        tpAndTn = n - self._testErrors
         # Percentage Accuracy = (number of correct classifications / total number of classifications) * 100
-        accuracy = (tpAndTn / n) * 100
-        print("Errors = ", errors, ", Accuracy = ", accuracy)
+        self._testAccuracy = (tpAndTn / n) * 100
+        print("Errors = {self._testErrors}, Accuracy = {self._testAccuracy:.1f}%".format(self=self))
 
 
-# Use main() method for implementation of Perceptron for classification tasks.
+#----------------------------------------------------------------------------------------------------------------------#
+
+
+# MAIN METHOD FOR IMPLEMENTATION OF CLASSIFICATION TASKS #
+
 def main():
     print("Script running in source file")
 
@@ -361,87 +406,90 @@ def main():
     testRecords = testArray[:,:4].astype("float64")
     testLabels = testArray[:,4]
 
+
     #------------------------------------------------------------------------------------------------------------------#
 
-    # ## Task 3 ##
-    # ## Use the binary perceptron to train classifiers to discriminate between two classes. ##
 
-    # ### Class 1 vs Class 2 ###
-    # print("\n\n# Class 1 vs Class 2 #")
+    ## Task 3 ##
+    ## Use the binary perceptron to train classifiers to discriminate between two classes. ##
+    print("\n\n# Task 3 - Binary Classification #")
 
-    # # Select records from classes 1 and 2.
-    # class1And2Records = trainingRecords[:80] # Training Input Data 
-    # class1And2TestRecords = testRecords[:20] # Test Input Data
+    ### Class 1 vs Class 2 ###
+    print("\n# Class 1 vs Class 2 #")
 
-    # # Assign binary labels for classes 1 and 2, where class 1 records are positive and class 2 are negative.
-    # class1And2Labels = np.where(trainingLabels[:80] == "class-1", 1, -1) # Training Data Labels
-    # class1And2TestLabels = np.where(testLabels[:20] == "class-1", 1, -1) # Test Data Labels
+    # Select records from classes 1 and 2.
+    class1And2Records = trainingRecords[:80] # Training Input Data 
+    class1And2TestRecords = testRecords[:20] # Test Input Data
 
-    # # Initialise an instance of the Perceptron for discriminating between class 1 and 2.
-    # classifier1Vs2 = Perceptron()
-    # # Train the Perceptron.
-    # classifier1Vs2.train(class1And2Records, class1And2Labels)
-    # # Test the Perceptron.
-    # classifier1Vs2.test(class1And2TestRecords, class1And2TestLabels)
+    # Assign binary labels for classes 1 and 2, where class 1 records are positive and class 2 are negative.
+    class1And2Labels = np.where(trainingLabels[:80] == "class-1", 1, -1) # Training Data Labels
+    class1And2TestLabels = np.where(testLabels[:20] == "class-1", 1, -1) # Test Data Labels
 
-
-    # ### Class 2 vs Class 3 ###
-    # print("\n\n# Class 2 vs Class 3 #")
-
-    # # Select records from classes 2 and 3.
-    # class2And3Records = trainingRecords[40:] # Training Input Data 
-    # class2And3TestRecords = testRecords[10:] # Test Input Data 
-
-    # # Assign binary labels for classes 2 and 3, where class 2 records are positive and class 3 are negative.
-    # class2And3Labels = np.where(trainingLabels[40:] == "class-2", 1, -1) # Training Data Labels
-    # class2And3TestLabels = np.where(testLabels[10:] == "class-2", 1, -1) # Test Data Labels
-
-    # # Initialise an instance of the Perceptron for discriminating between class 2 and 3.
-    # classifier2Vs3 = Perceptron()
-    # # Train the Perceptron.
-    # classifier2Vs3.train(class2And3Records, class2And3Labels)
-    # # Test the Perceptron.
-    # classifier2Vs3.test(class2And3TestRecords, class2And3TestLabels)
+    # Initialise an instance of the Perceptron for discriminating between class 1 and 2.
+    classifier1Vs2 = Perceptron()
+    # Train the Perceptron.
+    classifier1Vs2.train(class1And2Records, class1And2Labels)
+    # Test the Perceptron.
+    classifier1Vs2.test(class1And2TestRecords, class1And2TestLabels)
 
 
-    # ### Class 1 vs Class 3 ###
-    # print("\n\n# Class 1 vs Class 3 #")
+    ### Class 2 vs Class 3 ###
+    print("\n# Class 2 vs Class 3 #")
 
-    # # Select records from classes 1 and 3. Then concatenate the separate arrays for classes 1 and 3.
-    # class1Records = trainingRecords[:40]
-    # class3Records = trainingRecords[80:]
-    # class1And3Records = np.concatenate((class1Records, class3Records)) # Training Input Data 
+    # Select records from classes 2 and 3.
+    class2And3Records = trainingRecords[40:] # Training Input Data 
+    class2And3TestRecords = testRecords[10:] # Test Input Data 
 
-    # class1TestRecords = testRecords[:10]
-    # class3TestRecords = testRecords[20:]
-    # class1And3TestRecords = np.concatenate((class1TestRecords, class3TestRecords)) # Test Input Data 
+    # Assign binary labels for classes 2 and 3, where class 2 records are positive and class 3 are negative.
+    class2And3Labels = np.where(trainingLabels[40:] == "class-2", 1, -1) # Training Data Labels
+    class2And3TestLabels = np.where(testLabels[10:] == "class-2", 1, -1) # Test Data Labels
 
-    # class1Labels = np.ndarray.flatten(trainingLabels[:40])
-    # class3Labels = np.ndarray.flatten(trainingLabels[80:])
-    # class1And3Labels = np.concatenate((class1Labels, class3Labels)) # Training Data Labels (as strings)
+    # Initialise an instance of the Perceptron for discriminating between class 2 and 3.
+    classifier2Vs3 = Perceptron()
+    # Train the Perceptron.
+    classifier2Vs3.train(class2And3Records, class2And3Labels)
+    # Test the Perceptron.
+    classifier2Vs3.test(class2And3TestRecords, class2And3TestLabels)
 
-    # class1TestLabels = np.ndarray.flatten(testLabels[:10])
-    # class3TestLabels = np.ndarray.flatten(testLabels[20:])
-    # class1And3TestLabels = np.concatenate((class1TestLabels, class3TestLabels)) # Test Data Labels (as strings)
 
-    # # Assign binary labels for classes 1 and 3, where class 1 records are positive and class 3 are negative.
-    # class1And3Labels = np.where(class1And3Labels == "class-1", 1, -1) # Training Data Labels
-    # class1And3TestLabels = np.where(class1And3TestLabels == "class-1", 1, -1) # Test Data Labels
+    ### Class 1 vs Class 3 ###
+    print("\n# Class 1 vs Class 3 #")
 
-    # # Initialise an instance of the Perceptron for discriminating between class 1 and 3.
-    # classifier1Vs3 = Perceptron()
-    # # Train the Perceptron.
-    # classifier1Vs3.train(class1And3Records, class1And3Labels)
-    # # Test the Perceptron.
-    # classifier1Vs3.test(class1And3TestRecords, class1And3TestLabels)
+    # Select records from classes 1 and 3. Then concatenate the separate arrays for classes 1 and 3.
+    class1Records = trainingRecords[:40]
+    class3Records = trainingRecords[80:]
+    class1And3Records = np.concatenate((class1Records, class3Records)) # Training Input Data 
+
+    class1TestRecords = testRecords[:10]
+    class3TestRecords = testRecords[20:]
+    class1And3TestRecords = np.concatenate((class1TestRecords, class3TestRecords)) # Test Input Data 
+
+    class1Labels = np.ndarray.flatten(trainingLabels[:40])
+    class3Labels = np.ndarray.flatten(trainingLabels[80:])
+    class1And3Labels = np.concatenate((class1Labels, class3Labels)) # Training Data Labels (as strings)
+
+    class1TestLabels = np.ndarray.flatten(testLabels[:10])
+    class3TestLabels = np.ndarray.flatten(testLabels[20:])
+    class1And3TestLabels = np.concatenate((class1TestLabels, class3TestLabels)) # Test Data Labels (as strings)
+
+    # Assign binary labels for classes 1 and 3, where class 1 records are positive and class 3 are negative.
+    class1And3Labels = np.where(class1And3Labels == "class-1", 1, -1) # Training Data Labels
+    class1And3TestLabels = np.where(class1And3TestLabels == "class-1", 1, -1) # Test Data Labels
+
+    # Initialise an instance of the Perceptron for discriminating between class 1 and 3.
+    classifier1Vs3 = Perceptron()
+    # Train the Perceptron.
+    classifier1Vs3.train(class1And3Records, class1And3Labels)
+    # Test the Perceptron.
+    classifier1Vs3.test(class1And3TestRecords, class1And3TestLabels)
 
 
     #------------------------------------------------------------------------------------------------------------------#
 
 
     ## Task 4 ##
-    ## Extend the binary perceptron to perform multi-class classification using the One-vs-Rest approach. ##
-    print("\n\n# Multi-Class Classification: One vs Rest #")
+    ## Extend the binary Perceptron to perform multi-class classification using the One-vs-Rest approach. ##
+    print("\n\n# Task 4 - Multi-Class Classification: One vs Rest #")
 
     ### Class 1 vs Rest ###
     print("\n# Class 1 vs Rest #")
@@ -451,7 +499,7 @@ def main():
     testLabelsClass1 = np.where(testLabels == "class-1", 1, -1) # Test Data Labels
 
     # Initialise an instance of the binary Perceptron for the positive class 1.
-    classifier1VsRest = Perceptron(theMulticlass=True)
+    classifier1VsRest = Perceptron()
     # Train the Perceptron binary model on the entire training dataset.
     classifier1VsRest.train(trainingRecords, trainingLabelsClass1)
     # Test the Perceptron binary model on the entire test dataset.
@@ -466,7 +514,7 @@ def main():
     testLabelsClass2 = np.where(testLabels == "class-2", 1, -1) # Test Data Labels
 
     # Initialise an instance of the binary Perceptron for the positive class 2.
-    classifier2VsRest = Perceptron(theMulticlass=True)
+    classifier2VsRest = Perceptron()
     # Train the Perceptron binary model on the entire training dataset.
     classifier2VsRest.train(trainingRecords, trainingLabelsClass2)
     # Test the Perceptron binary model on the entire test dataset.
@@ -481,7 +529,7 @@ def main():
     testLabelsClass3 = np.where(testLabels == "class-3", 1, -1) # Test Data Labels
 
     # Initialise an instance of the binary Perceptron for the positive class 3.
-    classifier3VsRest = Perceptron(theMulticlass=True)
+    classifier3VsRest = Perceptron()
     # Train the Perceptron binary model on the entire training dataset.
     classifier3VsRest.train(trainingRecords, trainingLabelsClass3)
     # Test the Perceptron binary model on the entire test dataset.
@@ -489,8 +537,8 @@ def main():
 
 
     ### Multi-Class Classification ###
-    print("\n# Multi-Class Classification #")
-    
+    print("\n# Multi-Class #")
+
     # Labels reassigned as the integers 0, 1, and 2 for ease of comparison with the argmax values that are used to find
     #   the predicted label during multi-class classification.
     
@@ -516,6 +564,13 @@ def main():
     multiClassifier.train(multiclassTrainLabels)
     # Perform multi-class classification on the test data.
     multiClassifier.test(multiclassTestLabels)
+
+
+    #------------------------------------------------------------------------------------------------------------------#
+    
+    ## Task 5 ##
+    ## Add L2 regularisation to the multi-class classifier, setting the coefficient to 0.01, 0.1, 1.0, 10.0 and 100.0 ##
+    print("\n\n# Task 5 - Multi-Class Classification: One vs Rest with L2 Regularisation #")
 
 
 # Only performs classification tasks above if script has not been imported.

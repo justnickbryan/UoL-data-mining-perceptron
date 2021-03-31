@@ -4,16 +4,11 @@ Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
 ## To Do List
 
-* Amend printed output of the __str__ method to only show key attributes of the Perceptron: epochs, random seed, weights,
-    bias, multi-class classification T/F and L2 regularisation coefficient.
-
-* Move printout of training errors and accuracy to a separate print function under the training method.
-   
-* Improve evaluation method for Multiclass_Perceptron class
-
-* Update test method for Multiclass_Perceptron class
+* Amend printed output of the __str__ method to show L2 regularisation coefficient.
 
 * Add L2 regularisation Perceptron instances to the main() method.
+
+* Remove multiclass attribute from Perceptron class.
 
 
 ## Table of Contents
