@@ -102,15 +102,29 @@ class Perceptron:
                 # Calculate the activation score and predicted class label.
                 activationScore = self.adder(record)
                 predictedLabel = self.output(activationScore)
-                    
-                # Updates weights and bias only if misclassification occurs, i.e. when the product of predicted label
-                #   and true label equals negative one (e.g. predicted label = -1, true label = +1, product = -1).
-                if (predictedLabel * label) <= 0:
-                    # Add one to number of errors in current epoch for each misclassifcation.
-                    epochErrors += 1
-                    # Perform update rule for weights and bias.
-                    self._weights = self._weights + (label * record)
-                    self._bias = self._bias + label
+
+                # Check if L2 regularisation is in effect. If l2Coefficient is zero (default), no regularisation.
+                if self.l2Coefficient == 0.0:
+
+                    # Update weights and bias only if misclassification occurs, i.e. when the product of predicted label
+                    #   and true label equals negative one (e.g. predicted label = -1, true label = +1, product = -1).
+                    if (predictedLabel * label) <= 0:
+                        # Add one to number of errors in current epoch for each misclassifcation.
+                        epochErrors += 1
+                        # Perform update rule for weights and bias.
+                        self._weights = self._weights + (label * record)
+                        self._bias = self._bias + label
+
+                # Else, if l2Coefficient is a non-zero value, update rule is performed as per L2 regularisation method.
+                else:
+
+                    # As above, updates weights and bias only if misclassification occurs.
+                    if (predictedLabel * label) <= 0:
+                        # Add one to number of errors in current epoch for each misclassifcation.
+                        epochErrors += 1
+                        # Perform L2 regularisation update for weights and bias (assumes Perceptron learning rate is 1).
+                        self._weights = (1 - 2*self.l2Coefficient) * self._weights + (label * record)
+                        self._bias = (1 - 2*self.l2Coefficient) * self._bias + label
 
                 # One-vs-Rest: for a binary Perceptron, the confidence score is equal to the activation score.
                 if epoch == self.epochs:
@@ -572,6 +586,53 @@ def main():
     ## Add L2 regularisation to the multi-class classifier, setting the coefficient to 0.01, 0.1, 1.0, 10.0 and 100.0 ##
     print("\n\n# Task 5 - Multi-Class Classification: One vs Rest with L2 Regularisation #")
 
+    l2Coefficients = (0.01, 0.1, 1.0, 10.0, 100.0)
+
+    for i in l2Coefficients:
+
+        print("\nRegularisation Coefficient = ", i)
+
+        ### Class 1 vs Rest ###
+        print("\n# Class 1 vs Rest with L2 Regularisation #")
+
+        # Initialise an instance of the binary Perceptron for the positive class 1 with regularisation coefficient, i.
+        classifier1VsRestReg = Perceptron(theL2Coefficient=i)
+        # Train the Perceptron binary model on the entire training dataset.
+        classifier1VsRestReg.train(trainingRecords, trainingLabelsClass1)
+        # Test the Perceptron binary model on the entire test dataset.
+        classifier1VsRestReg.test(testRecords, testLabelsClass1)
+
+
+        ### Class 2 vs Rest ###
+        print("\n# Class 2 vs Rest with L2 Regularisation #")
+
+        # Initialise an instance of the binary Perceptron for the positive class 2 with regularisation coefficient, i.
+        classifier2VsRestReg = Perceptron(theL2Coefficient=i)
+        # Train the Perceptron binary model on the entire training dataset.
+        classifier2VsRestReg.train(trainingRecords, trainingLabelsClass2)
+        # Test the Perceptron binary model on the entire test dataset.
+        classifier2VsRestReg.test(testRecords, testLabelsClass2)
+
+
+        ### Class 3 vs Rest ###
+        print("\n# Class 3 vs Rest with L2 Regularisation #")
+
+        # Initialise an instance of the binary Perceptron for the positive class 3 with regularisation coefficient, i.
+        classifier3VsRestReg = Perceptron(theL2Coefficient=i)
+        # Train the Perceptron binary model on the entire training dataset.
+        classifier3VsRestReg.train(trainingRecords, trainingLabelsClass3)
+        # Test the Perceptron binary model on the entire test dataset.
+        classifier3VsRestReg.test(testRecords, testLabelsClass3)
+
+        ### Multi-Class Classification ###
+        print("\n# Multi-Class #")
+
+        # Initialise an instance of the multi-class Perceptron for evaluation of the One-vs-Rest approach.
+        multiClassifierReg = Multiclass_Perceptron((classifier1VsRestReg, classifier2VsRestReg, classifier3VsRestReg))
+        # Perform multi-class classification on the training data.
+        multiClassifierReg.train(multiclassTrainLabels)
+        # Perform multi-class classification on the test data.
+        multiClassifierReg.test(multiclassTestLabels)
 
 # Only performs classification tasks above if script has not been imported.
 if __name__ == "__main__":

@@ -6,8 +6,6 @@ Assignment 1 for module COMP527 to implement a Perceptron algorithm in Python.
 
 * Amend printed output of the __str__ method to show L2 regularisation coefficient.
 
-* Add L2 regularisation Perceptron instances to the main() method.
-
 * Remove multiclass attribute from Perceptron class.
 
 
