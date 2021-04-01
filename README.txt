@@ -31,19 +31,36 @@ Training and test accuracies are reported as a measure of classification perform
 
 Use the package manager (pip) to install numpy.
 
-```bash
+```
 pip install numpy
 ```
 
 
 ### 3. Usage
 
-Python file: "CA1_Perceptron.py"
+Python file for implementation of Perceptron: "CA1_Perceptron.py"
 
-In order to successfully run the analysis, ensure that the two data files "train.data" and "test.data" are stored in a
+In order to successfully run the code, ensure that the two data files "train.data" and "test.data" are stored in a
 subdirectory "Data" of the directory containing the script file "CA1_Perceptron.py".
     For example, this directory structure is demonstrated in the following GitHub repository:
     https://github.com/justnickbryan/UoL-data-mining-perceptron
+
+    Note for Visual Studio Code users:
+        Please ensure that the path of the terminal is configured to the directory containing the script file
+        "CA1_Perceptron.py" for the code to be run successfully.
+        If terminal is configured to a different directory, you may encounter errors in locating the "Data" subdirectory
+        containing "train.data" and "test.data".
+        Use the change directory ("cd") command followed by the path, for example if "CA1_Perceptron.py" is stored in a
+        directory called "COMP527", the command might be:
+
+        ```
+        cd "c:/Users/<abbreviated path>/COMP527"
+        ```
+
+Note:
+Whilst running the regularised multi-class classification with the regularisation coefficient set to 10, two
+RuntimeWarning messages will be encountered due to weight and bias values tending to +/- infinity. For the purpose of
+this assignment, these messages can be ignored.
 
 
 ### 4. Author
